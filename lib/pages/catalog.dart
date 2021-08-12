@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:provider_shopper/models/cart.dart';
+import 'package:provider_shopper/models/catalog.dart';
 
 class CatalogPage extends StatelessWidget {
   @override
@@ -48,13 +51,32 @@ class _AppBar extends StatelessWidget {
 }
 
 class _AddButton extends StatelessWidget {
-  const _AddButton({Key? key}) : super(key: key);
+  final Item item;
+
+  const _AddButton({
+    required this.item,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final isInCart = context.select<CartModel, bool>(
+      (cart) => cart.items.contains(item),
+    );
+
     return TextButton(
-      onPressed: () {},
-      child: const Text('Add'),
+      onPressed: isInCart
+          ? null
+          : () {
+              final cart = context.read<CartModel>();
+              cart.add(item);
+            },
+      child: isInCart
+          ? const Icon(
+              Icons.check,
+              semanticLabel: 'ADDED',
+            )
+          : const Text('Add'),
     );
   }
 }
@@ -66,6 +88,10 @@ class _ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final item = context.select<CatalogModel, Item>(
+      (catalog) => catalog.getByPosition(index),
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 16,
@@ -82,9 +108,13 @@ class _ListItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 24),
-            Expanded(child: Text('Item $index')),
+            Expanded(
+              child: Text(item.name),
+            ),
             const SizedBox(width: 24),
-            _AddButton(),
+            _AddButton(
+              item: item,
+            ),
           ],
         ),
       ),

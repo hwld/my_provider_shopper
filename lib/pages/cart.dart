@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:provider_shopper/models/cart.dart';
 
 class CartPage extends StatelessWidget {
   @override
@@ -33,8 +35,10 @@ class _CartList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<CartModel>();
+
     return ListView.builder(
-      itemCount: 3,
+      itemCount: cart.items.length,
       itemBuilder: (context, index) {
         return ListTile(
           leading: const Icon(Icons.done),
@@ -42,9 +46,13 @@ class _CartList extends StatelessWidget {
             icon: const Icon(
               Icons.remove_circle_outline,
             ),
-            onPressed: () {},
+            onPressed: () {
+              cart.remove(cart.items[index]);
+            },
           ),
-          title: Text('Sample'),
+          title: Text(
+            cart.items[index].name,
+          ),
         );
       },
     );
@@ -52,6 +60,8 @@ class _CartList extends StatelessWidget {
 }
 
 class _CartTotal extends StatelessWidget {
+  const _CartTotal({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -62,12 +72,20 @@ class _CartTotal extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('\$10000'),
+              Consumer<CartModel>(builder: (context, cart, child) {
+                return Text(
+                  '\$${cart.totalPrice}',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                );
+              }),
               const SizedBox(width: 24),
               TextButton(
                 onPressed: () {},
                 child: const Text('Buy'),
-              )
+              ),
             ],
           ),
         ),

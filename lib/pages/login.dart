@@ -20,6 +20,7 @@ class LoginPage extends StatelessWidget {
                 decoration: const InputDecoration(
                   hintText: 'Password',
                 ),
+                obscureText: true,
               ),
               const SizedBox(
                 height: 24,
